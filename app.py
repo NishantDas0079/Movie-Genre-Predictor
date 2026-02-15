@@ -76,26 +76,31 @@ def result():
 @app.route('/dashboard')
 def dashboard():
     # Load precomputed stats
-    with open('dashboard_stats.json', 'r') as f:
-        stats = json.load(f)
+    with open('genre_counts.json', 'r') as f:
+        genre_counts = json.load(f)
+    with open('f1_scores.json', 'r') as f:
+        f1_scores = json.load(f)
+    with open('plot_length_hist.json', 'r') as f:
+        hist_data = json.load(f)
 
     # 1. Genre frequency bar chart
-    genre_counts = stats['genre_counts']
     fig1 = px.bar(x=list(genre_counts.values()), y=list(genre_counts.keys()),
                   orientation='h', title='Genre Frequency in Training Data',
                   labels={'x': 'Count', 'y': 'Genre'},
                   color=list(genre_counts.values()), color_continuous_scale='Viridis')
     plot1 = plot(fig1, output_type='div', include_plotlyjs='cdn')
 
-    # 2. Plot length distribution
-    plot_lengths = stats['plot_lengths']
-    fig2 = px.histogram(x=plot_lengths, nbins=50,
-                        title='Distribution of Plot Lengths (words)',
-                        labels={'x': 'Word Count'}, marginal='box')
+    # 2. Plot length distribution (from histogram bins)
+    bin_edges = hist_data['bin_edges']
+    counts = hist_data['counts']
+    # Create a bar chart with bins
+    fig2 = px.bar(x=bin_edges[:-1], y=counts, 
+                  title='Distribution of Plot Lengths (words)',
+                  labels={'x': 'Word Count', 'y': 'Frequency'},
+                  nbins=50)
     plot2 = plot(fig2, output_type='div')
 
     # 3. F1 scores per genre
-    f1_scores = stats['f1_scores']
     genres = list(f1_scores.keys())
     scores = list(f1_scores.values())
     fig3 = px.bar(x=genres, y=scores, title='F1 Score per Genre (Test Set)',
@@ -103,21 +108,12 @@ def dashboard():
                   color=scores, color_continuous_scale='Reds')
     plot3 = plot(fig3, output_type='div')
 
-    # 4. Word cloud
-    all_text = stats['all_text']
-    wordcloud = WordCloud(width=800, height=400,
-                          background_color='white',
-                          colormap='viridis').generate(all_text)
-    img = io.BytesIO()
-    wordcloud.to_image().save(img, format='PNG')
-    img.seek(0)
-    wordcloud_img = base64.b64encode(img.getvalue()).decode()
-
+    # 4. Word cloud – serve the static image
     return render_template('dashboard.html',
                            plot1=plot1,
                            plot2=plot2,
                            plot3=plot3,
-                           wordcloud_img=wordcloud_img)
+                           wordcloud_img='/static/wordcloud.png')
 
 
 if __name__ == '__main__':
