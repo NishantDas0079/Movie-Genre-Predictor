@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import numpy as np
+import json
+
 
 # Download NLTK stopwords if not already present
 nltk.download('stopwords')
@@ -73,44 +75,39 @@ def result():
 # ------------------------------------------------------------
 @app.route('/dashboard')
 def dashboard():
-    # Load preprocessed data (or a sample) for visualisations
-    df = pd.read_csv('movies_preprocessed.csv')
+    # Load precomputed stats
+    with open('dashboard_stats.json', 'r') as f:
+        stats = json.load(f)
 
     # 1. Genre frequency bar chart
-    genre_counts = df[top_genres].sum().sort_values(ascending=False)
-    fig1 = px.bar(x=genre_counts.values, y=genre_counts.index,
-                  orientation='h',
-                  title='Genre Frequency in Training Data',
+    genre_counts = stats['genre_counts']
+    fig1 = px.bar(x=list(genre_counts.values()), y=list(genre_counts.keys()),
+                  orientation='h', title='Genre Frequency in Training Data',
                   labels={'x': 'Count', 'y': 'Genre'},
-                  color=genre_counts.values,
-                  color_continuous_scale='Viridis')
+                  color=list(genre_counts.values()), color_continuous_scale='Viridis')
     plot1 = plot(fig1, output_type='div', include_plotlyjs='cdn')
 
     # 2. Plot length distribution
-    fig2 = px.histogram(df, x='plot_words', nbins=50,
+    plot_lengths = stats['plot_lengths']
+    fig2 = px.histogram(x=plot_lengths, nbins=50,
                         title='Distribution of Plot Lengths (words)',
-                        labels={'plot_words': 'Word Count'},
-                        marginal='box')
+                        labels={'x': 'Word Count'}, marginal='box')
     plot2 = plot(fig2, output_type='div')
 
-    # 3. Model performance (F1 scores per genre) – from test set evaluation
-    #    These numbers are from your last grid search; you can replace them
-    #    with actual computed metrics if you have them.
-    f1_scores = [0.51, 0.45, 0.45, 0.48, 0.23, 0.17, 0.21, 0.69,
-                 0.21, 0.29, 0.24, 0.17, 0.15, 0.34, 0.20]  # order must match top_genres
-    fig3 = px.bar(x=top_genres, y=f1_scores,
-                  title='F1 Score per Genre (Test Set)',
+    # 3. F1 scores per genre
+    f1_scores = stats['f1_scores']
+    genres = list(f1_scores.keys())
+    scores = list(f1_scores.values())
+    fig3 = px.bar(x=genres, y=scores, title='F1 Score per Genre (Test Set)',
                   labels={'x': 'Genre', 'y': 'F1 Score'},
-                  color=f1_scores,
-                  color_continuous_scale='Reds')
+                  color=scores, color_continuous_scale='Reds')
     plot3 = plot(fig3, output_type='div')
 
-    # 4. Word cloud from all cleaned plots
-    all_text = ' '.join(df['clean_plot'].dropna())
+    # 4. Word cloud
+    all_text = stats['all_text']
     wordcloud = WordCloud(width=800, height=400,
                           background_color='white',
                           colormap='viridis').generate(all_text)
-    # Convert word cloud to PNG and then to base64 for embedding in HTML
     img = io.BytesIO()
     wordcloud.to_image().save(img, format='PNG')
     img.seek(0)
@@ -121,6 +118,7 @@ def dashboard():
                            plot2=plot2,
                            plot3=plot3,
                            wordcloud_img=wordcloud_img)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
