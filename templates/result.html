@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .plot-box {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 5px solid #ffd700;
+            font-style: italic;
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+            color: #ddd;
+        }
+
+        .genre-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .genre-tag {
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            color: #0f172a;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 1.1em;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .genre-tag:hover {
+            transform: scale(1.05);
+        }
+
+        .no-genres {
+            color: #ff6b6b;
+            font-style: italic;
+            padding: 10px;
+        }
+
+        .prob-section {
+            margin: 30px 0;
+        }
+
+        .prob-row {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            gap: 10px;
+        }
+
+        .genre-name {
+            width: 150px;
+            font-weight: 600;
+            color: #ffd700;
+        }
+
+        .prob-bar-container {
+            flex: 1;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .prob-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            border-radius: 12px;
+            transition: width 1s ease-in-out;
+            width: 0%; /* Will be set by inline style */
+        }
+
+        .prob-percent {
+            width: 60px;
+            text-align: right;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.2em;
+            transition: color 0.3s;
+            border: 1px solid #ffd700;
+            padding: 10px 30px;
+            border-radius: 40px;
+        }
+
+        .back-link:hover {
+            background: #ffd700;
+            color: #0f172a;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card">
+        <h1>🎬 PREDICTION RESULTS</h1>
+
+        <div class="plot-box">
+            {{ plot }}
+        </div>
+
+        <h2 style="color: #ffd700; margin-bottom: 15px;">Predicted Genres</h2>
+        <div class="genre-tags">
+            {% if predicted_genres %}
+                {% for genre in predicted_genres %}
+                    <span class="genre-tag">{{ genre }}</span>
+                {% endfor %}
+            {% else %}
+                <span class="no-genres">No strong genre signals – try a longer plot.</span>
+            {% endif %}
+        </div>
+
+        <h2 style="color: #ffd700; margin: 30px 0 20px;">Genre Probabilities</h2>
+        <div class="prob-section">
+            {% for genre, prob in genre_probs %}
+            <div class="prob-row">
+                <span class="genre-name">{{ genre }}</span>
+                <div class="prob-bar-container">
+                    <div class="prob-bar" style="width: {{ prob*100 }}%;"></div>
+                </div>
+                <span class="prob-percent">{{ '%.0f'|format(prob*100) }}%</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="footer">
+            <a href="/" class="back-link">← PREDICT ANOTHER</a>
+        </div>
+    </div>
+</body>
+</html>

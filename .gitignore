@@ -1,0 +1,33 @@
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Large data files
+*.csv
+*.zip
+movies_preprocessed.csv
+wiki_movie_plots_deduped.csv
+archive.zip
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE settings
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db

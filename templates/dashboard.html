@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Movie Genre Insights</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #0f172a;
+            color: white;
+            padding: 30px 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin-bottom: 40px;
+        }
+
+        .nav-bar {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .nav-bar a {
+            color: #ffd700;
+            text-decoration: none;
+            font-size: 1.2em;
+            border: 1px solid #ffd700;
+            padding: 10px 30px;
+            border-radius: 40px;
+            transition: all 0.3s;
+        }
+
+        .nav-bar a:hover {
+            background: #ffd700;
+            color: #0f172a;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .card h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 10px;
+        }
+
+        .plotly-chart {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .wordcloud {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .wordcloud img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>📊 CINEMA GENIUS DASHBOARD</h1>
+        <div class="nav-bar">
+            <a href="/">← Back to Predictor</a>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>🎭 Genre Frequency</h2>
+                <div class="plotly-chart">{{ plot1|safe }}</div>
+            </div>
+
+            <div class="card">
+                <h2>📏 Plot Length Distribution</h2>
+                <div class="plotly-chart">{{ plot2|safe }}</div>
+            </div>
+
+            <div class="card">
+                <h2>📈 Model Performance (F1 per Genre)</h2>
+                <div class="plotly-chart">{{ plot3|safe }}</div>
+            </div>
+
+            <div class="card">
+                <h2>☁️ Word Cloud of All Plots</h2>
+                <div class="wordcloud">
+                    <img src="data:image/png;base64,{{ wordcloud_img }}" alt="Word Cloud">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 Movie Genre Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 10% 30%, #1a1a2e, #16213e, #0f3460);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Film strip effect */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(45deg, rgba(255,215,0,0.03) 0px, rgba(255,215,0,0.03) 20px, transparent 20px, transparent 40px);
+            pointer-events: none;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 40px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 215, 0, 0.1) inset;
+            padding: 50px;
+            max-width: 900px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            font-size: 3em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
+            margin-bottom: 10px;
+        }
+
+        h1 span {
+            display: block;
+            font-size: 0.3em;
+            font-weight: 300;
+            color: #ccc;
+            text-shadow: none;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .input-area {
+            margin: 40px 0 30px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ffd700;
+            border-radius: 20px;
+            font-size: 1.1em;
+            color: #fff;
+            resize: vertical;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #fff;
+            box-shadow: 0 0 30px #ffd700;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        button, .sample-btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: 600;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .predict-btn {
+            background: linear-gradient(45deg, #ffd700, #ffb347);
+            color: #1a1a2e;
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.6);
+        }
+
+        .sample-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffd700;
+            border: 1px solid #ffd700;
+            backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            font-size: 0.9em;
+        }
+
+        .sample-btn:hover {
+            background: #ffd700;
+            color: #1a1a2e;
+            transform: scale(1.05);
+        }
+
+        .example-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+
+        .footer-note a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 5px;
+            transition: color 0.3s;
+        }
+
+        .footer-note a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            🎬 CINEMA GENIUS
+            <span>Predict movie genres from plot descriptions</span>
+        </h1>
+
+        <form action="/result" method="post">
+            <div class="input-area">
+                <textarea name="plot" rows="6" placeholder="Paste a movie plot here... (e.g., 'A hacker discovers the truth about reality...')" required></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="predict-btn">🔍 PREDICT GENRES</button>
+            </div>
+        </form>
+
+        <!-- Quick sample buttons -->
+        <div class="example-links">
+            <button class="sample-btn" onclick="fillMatrix()">🎬 The Matrix</button>
+            <button class="sample-btn" onclick="fillTitanic()">🚢 Titanic</button>
+            <button class="sample-btn" onclick="fillInception()">🌀 Inception</button>
+        </div>
+
+        <div class="footer-note">
+            ⚡ Powered by Machine Learning · 
+            <a href="/dashboard">📊 EXPLORE DASHBOARD</a>
+        </div>
+    </div>
+
+    <script>
+        function fillMatrix() {
+            document.querySelector('textarea[name="plot"]').value = 
+                `Thomas A. Anderson is a man living two lives. By day he is an average computer programmer and by night a hacker known as Neo. Neo has always questioned his reality, but the truth is far beyond his imagination. He finds himself targeted by the police when he is contacted by Morpheus, a legendary computer hacker branded a terrorist by the government. Morpheus awakens Neo to the real world: a ravaged wasteland where most of humanity is cultivated by sentient machines, used as batteries to power their cities. The machines have created a simulated reality called the Matrix to keep human minds occupied while they harvest their bodies. Neo joins a rebellion against the machines and is trained to manipulate the Matrix's rules, becoming a powerful weapon in the fight for humanity's freedom.`;
+        }
+
+        function fillTitanic() {
+            document.querySelector('textarea[name="plot"]').value = 
+                `A seventeen-year-old aristocrat, Rose, accompanies her wealthy fiancé Cal on the ill-fated maiden voyage of the RMS Titanic. She feels trapped by her privileged but stifling life and contemplates suicide. Jack Dawson, a poor artist traveling in third class, saves her, and they form a bond. Despite Cal's disapproval and the strict class divisions, Rose and Jack fall deeply in love. Their romance unfolds against the backdrop of the ship's tragic collision with an iceberg. As the Titanic sinks, the couple fights to survive amidst the chaos, with Jack making the ultimate sacrifice to save Rose.`;
+        }
+
+        function fillInception() {
+            document.querySelector('textarea[name="plot"]').value = 
+                `Dom Cobb is a skilled thief, the absolute best in the dangerous art of extraction: stealing valuable secrets from deep within the subconscious during the dream state, when the mind is at its most vulnerable. Cobb's rare ability has made him a coveted player in this treacherous new world of corporate espionage, but it has also cost him everything he loves. Now Cobb is being offered a chance at redemption. One last job could give him his life back but only if he can accomplish the impossible: inception, instead of stealing an idea, he must plant one. If they succeed, Cobb and his team could pull off the perfect crime. However, no matter how sophisticated, no plan could prepare them for a dangerous enemy that seems to predict their every move.`;
+        }
+    </script>
+</body>
+</html>
